@@ -15,6 +15,12 @@ public class BankAccount {
 		numberOfAccounts++;
 	}
 	
+	private void totalMoney() {
+		System.out.println("Account number: " + this.accountNumber);
+		System.out.println("Checking account: $" + this.checkingsBalance);
+		System.out.println("Savings accoung: $" + this.savingsBalance);
+	}
+	
 	// Getter for checkingsBalance
 	private double getCheckingsBalance() {
 		return checkingsBalance;
@@ -87,6 +93,7 @@ public class BankAccount {
 	private void checkBalance() {
 		System.out.println("Your checks account balance is " + checkingsBalance);
 		System.out.println("Your savings account balance is " + savingsBalance);
+		
 	}
 
 	
@@ -100,11 +107,15 @@ public class BankAccount {
 		client2.getAccountNumber();
 		
 		client1.depositMoney(300.00);
-		client1.checkBalance();
 		client1.depositMoney(625.75);
-		client1.checkBalance();
 		client1.withdrawMoney(150.00);
 		client1.checkBalance();
+		client2.depositMoney(400);
+		client2.checkBalance();
+		System.out.println("\n\n");
+		client1.totalMoney();
+		client2.totalMoney();
+		
 		System.out.println("Total number of accounts " + numberOfAccounts);
 		
 	}
