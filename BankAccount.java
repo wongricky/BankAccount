@@ -1,7 +1,15 @@
 package com.bankaccountproject;
+
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.Scanner;
 
+
 public class BankAccount {
+	
+	private static DecimalFormat df2 = new DecimalFormat("#,###.00");
+	
+	// TODO set rounding mode, decimal point - limit to 2 places
 	
 	public long accountNumber;
 	public double checkingsBalance = 0;
@@ -15,7 +23,7 @@ public class BankAccount {
 		numberOfAccounts++;
 	}
 	
-	private void totalMoney() {
+	private void accountOverview() {
 		System.out.println("Account number: " + this.accountNumber);
 		System.out.println("Checking account: $" + this.checkingsBalance);
 		System.out.println("Savings accoung: $" + this.savingsBalance);
@@ -23,28 +31,38 @@ public class BankAccount {
 	
 	// Getter for checkingsBalance
 	private double getCheckingsBalance() {
+		//checkingsBalance = Double.parseDouble(df2.format(checkingsBalance));
 		return checkingsBalance;
 	}
 	
 	// Getter for savingsBalance
 	private double getSavingsBalance() {
+		//savingsBalance = Double.parseDouble(df2.format(savingsBalance));
 		return savingsBalance;
 	}
 	
 	// Deposit money
-	private void depositMoney(double amount) {
-		System.out.println("Deposit to which account: 'C' for checkings / 'S' for savings");
+	private void depositMoney() {
+		System.out.println("Deposit to CHECKINGS or SAVINGS account?");
 		Scanner deposit = new Scanner(System.in);
 		String accountType = deposit.nextLine();
-		while (!accountType.equals("C") || !accountType.contentEquals("c") || !accountType.equals("S") || !accountType.contentEquals("s")) {	
-			if (accountType.equals("C") || accountType.equals("c")) {
+
+		Character firstLetter = accountType.toUpperCase().charAt(0);
+		
+		System.out.println("How much would you like to deposit?");
+		Scanner depositAmount = new Scanner(System.in);
+		double amount = depositAmount.nextDouble();
+		amount = Double.parseDouble(df2.format(amount));
+		
+		while (!firstLetter.equals('C') || !firstLetter.equals('S')) {	
+			if (firstLetter.equals('C')) {
 				checkingsBalance += amount;
-				System.out.println("The amount of " + amount + " has been deposited to your checkings account.");
+				System.out.println("$" + String.format("%.2f", amount) + " has been deposited to your checkings account.");
 				break;
 			}
-			else if (accountType.equals("S") || accountType.contentEquals("s")) {
+			else if (firstLetter.equals('S')) {
 				savingsBalance += amount;
-				System.out.println("The amount of " + amount + " has been deposited to your saving account.");
+				System.out.println("$" + String.format("%.2f", amount) + " has been deposited to your saving account.");
 				break;
 			}
 			else {
@@ -55,32 +73,50 @@ public class BankAccount {
 	}
 	
 	// Withdraw money
-	private void withdrawMoney(double amount) {
-		System.out.println("Withdraw from which account: 'C' for checkings / 'S' for savings");
+	private void withdrawMoney() {
+		System.out.println("Withdraw from CHECKINGS or SAVINGS account?");
 		Scanner withdraw = new Scanner(System.in);
 		String accountType = withdraw.nextLine();
-		while (!accountType.equals("C") || !accountType.contentEquals("c") || !accountType.equals("S") || !accountType.contentEquals("s")) {	
-			if (accountType.equals("C") || accountType.equals("c")) {
+		
+		Character firstLetter = accountType.toUpperCase().charAt(0);
+		
+		System.out.println("How much would you like to withdraw?");
+		Scanner withdrawAmount = new Scanner(System.in);
+		double amount = withdrawAmount.nextDouble();
+		amount = Double.parseDouble(df2.format(amount));
+		
+		boolean insufficientFunds = false;
+		
+		while (!firstLetter.equals('C') || !firstLetter.equals('S') || insufficientFunds == true) {	
+			if (firstLetter.equals('C')) {
 				checkingsBalance -= amount;
 				if (checkingsBalance < 0) {
+					insufficientFunds = true;
 					System.out.println("Insufficient funds");
 					checkingsBalance += amount;
+					System.out.println("Please enter a different amount:");
+					amount = withdrawAmount.nextDouble();
 				}
 				else {
-					System.out.println("The amount of " + amount + " has been withdrawn from your checkings account.");
+					insufficientFunds = false;
+					System.out.println("$" + amount + " has been withdrawn from your checkings account.");
+					break;
 				}
-				break;
 			}
-			else if (accountType.equals("S") || accountType.contentEquals("s")) {
+			else if (firstLetter.equals('S')) {
 				savingsBalance -= amount;
 				if (savingsBalance < 0) {
+					insufficientFunds = true;
 					System.out.println("Insufficient funds");
 					savingsBalance += amount;
+					System.out.println("Please enter a different amount:");
+					amount = withdrawAmount.nextDouble();
 				}
 				else {
-					System.out.println("The amount of " + amount + " has been withdraw from your saving account."); 
+					insufficientFunds = false;
+					System.out.println("$" + amount + " has been withdraw from your saving account."); 
+					break;
 				}
-				break;
 			}
 			else {
 				System.out.println("Please enter a valid key.");
@@ -89,10 +125,34 @@ public class BankAccount {
 		}
 	}
 	
-	// Check balance: savings and checkings
+	// TODO separate checkings and savings balance, ask user
 	private void checkBalance() {
-		System.out.println("Your checks account balance is " + checkingsBalance);
-		System.out.println("Your savings account balance is " + savingsBalance);
+		Scanner checkBalance = new Scanner(System.in);
+		System.out.println("Account Number: " + accountNumber + "\nCheck your balance for CHECKINGS, SAVINGS, or BOTH?");
+		
+		Character userResponse = checkBalance.nextLine().toUpperCase().charAt(0);
+		
+		while (!userResponse.equals('C') || !userResponse.equals('S') || !userResponse.equals('B')) {
+			
+			if (userResponse.equals('C')) {
+				System.out.println("Your checkings account balance is $" + checkingsBalance);
+				break;
+			}
+			else if (userResponse.equals('S')) {
+				System.out.println("Your savings account balance is $" + savingsBalance);
+				break;
+			}
+			else if (userResponse.equals('B')) {
+				System.out.println("Your checkings account balance is $" + checkingsBalance);
+				System.out.println("Your savings account balance is $" + savingsBalance);
+				break;
+			}
+			else {
+				System.out.println("Please ender a valid response.");
+				userResponse = checkBalance.nextLine().toUpperCase().charAt(0);
+			}
+			
+		}
 		
 	}
 
@@ -101,22 +161,27 @@ public class BankAccount {
 	
 	
 	public static void main(String[] args) {
+		
+		// TODO
+		// - create entry point option for user to choose:
+		//   deposit, withdraw, check balance
+		// - option for user to do something else or end transaction
+		
 		BankAccount client1 = new BankAccount();
 		client1.getAccountNumber();
 		BankAccount client2 = new BankAccount();
 		client2.getAccountNumber();
 		
-		client1.depositMoney(300.00);
-		client1.depositMoney(625.75);
-		client1.withdrawMoney(150.00);
-		client1.checkBalance();
-		client2.depositMoney(400);
+//		client1.depositMoney();
+//		client1.depositMoney();
+//		client1.withdrawMoney();
+//		client1.checkBalance();
+		client2.depositMoney();
+		client2.withdrawMoney();
 		client2.checkBalance();
 		System.out.println("\n\n");
-		client1.totalMoney();
-		client2.totalMoney();
+		client2.accountOverview();
 		
-		System.out.println("Total number of accounts " + numberOfAccounts);
 		
 	}
 
